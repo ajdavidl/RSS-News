@@ -142,7 +142,9 @@ def parse_listas(lista_usuarios_nitter, lista_urls_rss):
     return(df)
 
 
-def pacote_noticias():
+def pacote_noticias(language='All'):
+    if language not in ['pt', 'en', 'es', 'it', 'fr', 'de', 'ro', 'ca', 'ds', 'All']:
+        raise("Idioma não suportado.")
     lista_usuarios_pt = []
     lista_rss_pt = ["https://news.google.com/rss/topics/CAAqJQgKIh9DQkFTRVFvSUwyMHZNREUxWm5JU0JYQjBMVUpTS0FBUAE?hl=pt-BR&gl=BR&ceid=BR%3Apt-419",
                     "https://news.google.com/rss/topics/CAAqLAgKIiZDQkFTRmdvSkwyMHZNR1ptZHpWbUVnVndkQzFDVWhvQ1FsSW9BQVAB?hl=pt-BR&gl=BR&ceid=BR%3Apt-419",
@@ -177,10 +179,28 @@ def pacote_noticias():
                          'odsc', 'OpenAI', 'DeepMind', 'GoogleAI', 'Marktechpost']
     lista_rss_ds = ["http://export.arxiv.org/rss/cs.CL/recent",
                     "http://export.arxiv.org/rss/cs.CV/recent"]
-
-    df = parse_listas(
-        lista_usuarios_nitter=lista_usuarios_pt + lista_usuarios_en + lista_usuarios_es + lista_usuarios_it +
-        lista_usuarios_fr + lista_usuarios_de + lista_usuarios_ro +
-        lista_usuarios_ca + lista_usuarios_ds,
-        lista_urls_rss=lista_rss_pt + lista_rss_en + lista_rss_es + lista_rss_es + lista_rss_it + lista_rss_fr + lista_rss_de + lista_rss_ro + lista_rss_ca + lista_rss_ds)
+    if language == 'All':
+        df = parse_listas(
+            lista_usuarios_nitter=lista_usuarios_pt + lista_usuarios_en + lista_usuarios_es + lista_usuarios_it +
+            lista_usuarios_fr + lista_usuarios_de + lista_usuarios_ro +
+            lista_usuarios_ca + lista_usuarios_ds,
+            lista_urls_rss=lista_rss_pt + lista_rss_en + lista_rss_es + lista_rss_es + lista_rss_it + lista_rss_fr + lista_rss_de + lista_rss_ro + lista_rss_ca + lista_rss_ds)
+    elif language == 'pt':
+        df = parse_listas(lista_usuarios_pt, lista_rss_pt)
+    elif language == 'en':
+        df = parse_listas(lista_usuarios_en, lista_rss_en)
+    elif language == 'es':
+        df = parse_listas(lista_usuarios_es, lista_rss_es)
+    elif language == 'it':
+        df = parse_listas(lista_usuarios_it, lista_rss_it)
+    elif language == 'fr':
+        df = parse_listas(lista_usuarios_fr, lista_rss_fr)
+    elif language == 'de':
+        df = parse_listas(lista_usuarios_de, lista_rss_de)
+    elif language == 'ro':
+        df = parse_listas(lista_usuarios_ro, lista_rss_ro)
+    elif language == 'ca':
+        df = parse_listas(lista_usuarios_ca, lista_rss_ca)
+    elif language == 'ds':
+        df = parse_listas(lista_usuarios_ds, lista_rss_ds)
     return df
