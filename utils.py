@@ -112,14 +112,22 @@ def retorna_noticias(url):
     except:
         print("Erro em ", url)
     index = [hash(s) for s in textos]
-    df = pd.DataFrame({'titulo': titulos,
-                       'usuario': usuarios,
-                       'data': datas,
-                       'texto': textos,
-                       'link': links}, index=index)
-    df.texto = df.texto.apply(strip_html_tags)
-    if NITTER_URL in url:
-        df.usuario = df.usuario.apply(lambda x: x[1:])
+    try:
+        df = pd.DataFrame({'titulo': titulos,
+                           'usuario': usuarios,
+                           'data': datas,
+                           'texto': tweets,
+                           'link': links}, index=index)
+        #df.texto = df.texto.apply(strip_html_tags)
+        if NITTER_URL in url:
+            df.usuario = df.usuario.apply(lambda x: x[1:])
+    except:
+        df = pd.DataFrame({'titulo': [],
+                           'usuario': [],
+                           'data': [],
+                           'texto': [],
+                           'link': []}, index=[])
+        print(f"erro em {url}")
     return(df)
 
 
@@ -132,13 +140,15 @@ def parse_listas(lista_usuarios_nitter, lista_urls_rss):
                        'link': []})
     for user in lista_usuarios_nitter:
         df_aux = retorna_noticias(nitter_url+user+"/rss")
-        df = pd.concat([df, df_aux])
-        df = df.drop_duplicates()
-        time.sleep(5)
+        if df_aux.shape[0] > 0:
+            df = pd.concat([df, df_aux])
+            df = df.drop_duplicates()
+            time.sleep(5)
     for url in lista_urls_rss:
         df_aux = retorna_noticias(url)
-        df = pd.concat([df, df_aux])
-        df = df.drop_duplicates()
+        if df_aux.shape[0] > 0:
+            df = pd.concat([df, df_aux])
+            df = df.drop_duplicates()
     return(df)
 
 
@@ -174,11 +184,14 @@ def pacote_noticias(language='All'):
     lista_usuarios_ca = []
     lista_rss_ca = [
         "https://emm.newsbrief.eu/rss/rss?type=rtn&language=ca&duplicates=false"]
-    lista_usuarios_ds = ['AnalyticsVidhya', 'juliabloggers', 'Rbloggers', 'kdnuggets',
-                         'TDataScience', 'TeachTheMachine', 'analyticbridge', 'paperswithcode',
-                         'odsc', 'OpenAI', 'DeepMind', 'GoogleAI', 'Marktechpost']
+    lista_usuarios_ds = []
     lista_rss_ds = ["http://export.arxiv.org/rss/cs.CL/recent",
-                    "http://export.arxiv.org/rss/cs.CV/recent"]
+                    "http://export.arxiv.org/rss/cs.CV/recent",
+                    "https://towardsdatascience.com/feed",
+                    "http://feeds.feedburner.com/kdnuggets-data-mining-analytics",
+                    "https://www.analyticsvidhya.com/feed",
+                    "https://feeds.feedburner.com/RBloggers"
+                    ]
     if language == 'All':
         df = parse_listas(
             lista_usuarios_nitter=lista_usuarios_pt + lista_usuarios_en + lista_usuarios_es + lista_usuarios_it +
